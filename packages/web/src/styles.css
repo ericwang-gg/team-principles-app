@@ -1,0 +1,845 @@
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/DMSans-VariableFont.ttf") format("truetype-variations");
+  font-weight: 400 700;
+}
+@font-face {
+  font-family: "Cooper";
+  src: url("/fonts/CooperLightBT.ttf") format("truetype");
+  font-weight: 300;
+}
+@font-face {
+  font-family: "Cooper";
+  src: url("/fonts/Cooper-Md-BT-Medium.ttf") format("truetype");
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Cooper";
+  src: url("/fonts/CooperLtBTBold.ttf") format("truetype");
+  font-weight: 700;
+}
+
+:root {
+  --freedom-blue: #003bed;
+  --freedom-blue-hover: #0033cb;
+  --electric-mint: #19f9b9;
+  --road: #1d2429;
+  --air: #e9f0f7;
+  --body-text: #46515a;
+  --muted-text: #7f8991;
+  --hairline: #d6dee7;
+  --light-blue-pill: #e6ebfd;
+  --disabled-fill: #b7c0c7;
+  --disabled-border: #e4e9ee;
+  --danger: #ff4a4a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--air);
+  color: var(--road);
+  font-family: "DM Sans", system-ui, sans-serif;
+  /* Safety net for user-entered text (a pasted URL, a long hyphen-less
+     word) — normal space-separated sentences already wrap fine without
+     this, it only kicks in for a single unbreakable token that would
+     otherwise overflow its container. */
+  overflow-wrap: break-word;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-bar {
+  width: 100%;
+  max-width: 880px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 16px;
+}
+
+.app-bar img {
+  height: 22px;
+}
+
+.app-bar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Used where truncating the text would lose meaning (e.g. a long principle
+   title shown as a reference chip) — wrap instead of ellipsis-truncating. */
+.pill--wrap {
+  white-space: normal;
+  overflow-wrap: break-word;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: none;
+}
+
+.pill--blue {
+  background: var(--light-blue-pill);
+  color: var(--freedom-blue);
+}
+
+.center-column {
+  flex: 1;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+  padding: 40px 24px;
+}
+
+h1.hero {
+  font-family: "Cooper", serif;
+  font-weight: 500;
+  font-size: 52px;
+  margin: 0;
+  line-height: 1.05;
+}
+
+h2.lobby-headline {
+  font-family: "Cooper", serif;
+  font-weight: 500;
+  font-size: 38px;
+  margin: 0;
+}
+
+.subhead {
+  font-size: 18px;
+  color: var(--body-text);
+  margin: 0;
+}
+
+.pill-input {
+  width: 280px;
+  max-width: 100%;
+  /* max-width alone doesn't stop a flex item from resisting shrinkage below
+     its own specified width — an <input> has no content to wrap, so its
+     "automatic minimum size" defaults to that 280px regardless of
+     max-width. min-width: 0 is what actually lets it shrink in a flex
+     layout (e.g. .comment-input-row) narrower than the phone screen. */
+  min-width: 0;
+  border-radius: 9999px;
+  border: 1.5px solid var(--hairline);
+  padding: 14px 24px;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+.pill-input:focus {
+  border-color: var(--freedom-blue);
+}
+
+.btn {
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 32px;
+}
+
+.btn--primary {
+  background: var(--freedom-blue);
+  color: white;
+}
+
+.btn--primary:hover {
+  background: var(--freedom-blue-hover);
+}
+
+.btn--primary:disabled {
+  background: var(--disabled-fill);
+  cursor: default;
+}
+
+.roster {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.roster-chip {
+  border-radius: 9999px;
+  border: 1px solid var(--hairline);
+  background: white;
+  padding: 8px 18px;
+  font-size: 14px;
+}
+
+.debug-panel {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 520px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 24px;
+  font-size: 13px;
+  color: var(--muted-text);
+  text-align: left;
+}
+
+.debug-panel pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: white;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 12px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.pill--demo {
+  background: var(--danger);
+  color: white;
+}
+
+.pill--outline {
+  background: transparent;
+  color: var(--road);
+  border: 1.5px solid var(--hairline);
+}
+
+.wide-column {
+  max-width: 880px;
+}
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-text);
+}
+
+.timer-chip {
+  background: var(--air);
+  color: var(--road);
+  border: 1px solid var(--hairline);
+}
+
+.question-title {
+  font-family: "Cooper", serif;
+  font-weight: 500;
+  font-size: clamp(22px, 6vw, 32px);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.round-column {
+  gap: 20px;
+}
+
+.answer-card {
+  width: 100%;
+  background: white;
+  border: 1px solid var(--hairline);
+  border-radius: 36px;
+  padding: clamp(20px, 6vw, 40px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.answer-card h3 {
+  font-family: "Cooper", serif;
+  font-weight: 500;
+  font-size: 24px;
+  margin: 0;
+}
+
+.answer-textarea {
+  width: 100%;
+  min-height: 100px;
+  border-radius: 20px;
+  border: 1.5px solid var(--hairline);
+  padding: 16px 20px;
+  font: inherit;
+  font-size: 16px;
+  resize: vertical;
+  outline: none;
+}
+
+.answer-textarea:focus {
+  border-color: var(--freedom-blue);
+}
+
+.revealed-answers {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.revealed-card {
+  background: white;
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  padding: 20px 24px;
+}
+
+.revealed-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.revealed-card p {
+  margin: 0;
+  color: var(--body-text);
+}
+
+.facilitator-footer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 20px;
+}
+
+.facilitator-footer-count {
+  font-size: 14px;
+  color: var(--muted-text);
+}
+
+.principle-selector {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.revealed-principle-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.scenario-strip {
+  width: 100%;
+  text-align: center;
+}
+
+.scenario-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.topic-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.topic-card {
+  background: white;
+  border: 1.5px solid var(--hairline);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-card strong {
+  color: var(--freedom-blue);
+}
+
+.topic-card p {
+  margin: 0;
+  color: var(--body-text);
+  font-size: 14px;
+}
+
+.topic-card--selected {
+  border-color: var(--freedom-blue);
+  border-width: 2px;
+}
+
+.topic-comment-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--road);
+  margin: 4px 0 6px;
+}
+
+.required-asterisk {
+  color: var(--danger);
+}
+
+.topic-comment {
+  width: 100%;
+  border-radius: 16px;
+  border: 1.5px solid var(--hairline);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+}
+
+.topic-comment:focus {
+  border-color: var(--freedom-blue);
+}
+
+.toggle-pill {
+  align-self: flex-start;
+  border: 1.5px solid var(--hairline);
+  background: white;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+}
+
+.toggle-pill--on {
+  background: var(--freedom-blue);
+  color: white;
+  border-color: var(--freedom-blue);
+}
+
+.toggle-pill:disabled {
+  background: var(--disabled-fill);
+  border-color: var(--disabled-border);
+  color: white;
+  cursor: default;
+}
+
+.poster-card {
+  width: 100%;
+  background: white;
+  border-radius: 36px;
+  padding: clamp(20px, 6vw, 56px);
+  text-align: center;
+}
+
+.poster-title {
+  font-family: "Cooper", serif;
+  font-weight: 500;
+  font-size: 42px;
+  margin: 0;
+}
+
+.poster-byline {
+  color: var(--muted-text);
+  font-size: 14px;
+  margin: 8px 0 32px;
+}
+
+.principle-row {
+  display: flex;
+  gap: 20px;
+  text-align: left;
+  padding: 20px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.principle-row:first-of-type {
+  border-top: none;
+}
+
+.principle-numeral {
+  font-family: "Cooper", serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--freedom-blue);
+  min-width: 32px;
+}
+
+.principle-body {
+  flex: 1;
+}
+
+.principle-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Flex children holding arbitrary-length text default to a minimum size
+   based on their content in some browsers, resisting shrinking below that
+   even when they should wrap — min-width: 0 forces them to actually shrink
+   and wrap inside the flex row instead of pushing it wider than its
+   container. Covers both Poster.tsx's <strong> and FinalPoster.tsx's
+   .final-poster-row-title, which share this same flex row. */
+.principle-title-row > strong,
+.principle-title-row > .final-poster-row-title {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.principle-body strong {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 6px;
+}
+
+.delete-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--danger);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.delete-link:hover {
+  text-decoration: underline;
+}
+
+.delete-x {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--danger);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.delete-x:hover {
+  opacity: 0.7;
+}
+
+.principle-body p {
+  margin: 0;
+  color: var(--body-text);
+}
+
+.principle-edit-title {
+  width: 100%;
+  text-align: left;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.comment-list {
+  margin-top: 16px;
+  /* Fixed 56px was eating a third or more of the already-narrow poster
+     card's width on a phone — scale it down instead of holding it flat. */
+  padding-left: clamp(16px, 8vw, 56px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--body-text);
+}
+
+.comment-text {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.comment-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.comment-textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1.5px solid var(--hairline);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  /* Height is driven by JS (Poster.tsx's autoGrow) to fit content — no
+     manual resize handle (would fight with auto-grow) and no internal
+     scrollbar while it catches up. */
+  resize: none;
+  overflow: hidden;
+  outline: none;
+}
+
+.comment-textarea:focus {
+  border-color: var(--freedom-blue);
+}
+
+/* flex: 1 1 0 (not the default auto) is what let the old fixed-width
+   .pill-input version of this box actually shrink to share the row with
+   the "Add" button on narrow screens — kept here even though this is now a
+   width:100% textarea, for the same reason: default flex-basis:auto would
+   use that 100% as its starting size and immediately push the button onto
+   its own line even on desktop, which isn't what we want above the mobile
+   breakpoint below. */
+.comment-input-row .comment-textarea {
+  flex: 1 1 0;
+  width: auto;
+}
+
+/* On phone-width screens, sharing a row with the "Add" button still leaves
+   the textarea pretty cramped even though it no longer overflows — stack
+   them instead so it gets the full row width to type in. */
+@media (max-width: 600px) {
+  /* The left indent nests comments under their principle, which reads fine
+     on desktop but just wastes width and looks unbalanced once the box
+     is full-width on mobile — drop it below this breakpoint. */
+  .comment-list {
+    padding-left: 0;
+  }
+
+  .comment-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .comment-input-row .comment-textarea {
+    flex: none;
+    width: 100%;
+  }
+
+  .comment-input-row .btn {
+    width: 100%;
+  }
+}
+
+.poster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.paper-size-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn--secondary {
+  background: var(--road);
+  color: var(--air);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--road);
+  border: 1.5px solid var(--road);
+}
+
+.btn--mint {
+  background: var(--electric-mint);
+  color: var(--road);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Final poster — matches the finalized wall-hanging design exactly
+   (../../Poster/Team Principles - Poster Export 3b.dc.html): a full-bleed
+   A4 page, GetGo mark + team-huddle watermark, six rows filling the page. */
+.final-poster-page {
+  width: 794px;
+  max-width: 100%;
+  aspect-ratio: 210 / 297;
+  background: white;
+  position: relative;
+  /* auto, not hidden — on a narrow phone-width box, fixed-size content that
+     didn't fit used to be silently clipped with no way to see it. auto only
+     shows a scrollbar if content genuinely doesn't fit; at desktop sizes,
+     where it always fits, nothing visibly changes. */
+  overflow: auto;
+  box-sizing: border-box;
+  /* Percentage padding resolves against the box's own width, so it shrinks
+     in step with the width: 794px/max-width: 100% sizing above instead of
+     eating a fixed 80px regardless of viewport — that was consuming ~49% of
+     the box's width on a phone and clipping rows 3-6 entirely. */
+  padding: 10%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(29, 36, 41, 0.12);
+}
+
+/* Editing swaps each row's text for input/textarea fields, which are taller
+   than the printed text they replace — the fixed A4/A3-proportioned height
+   above (plus overflow:hidden) was clipping principles 5 and 6 out of view
+   and out of reach. While editing, let the page grow to fit instead; the
+   fixed print-accurate box comes back once editing ends. */
+.final-poster-page.editing {
+  aspect-ratio: auto;
+  height: auto;
+  overflow: visible;
+}
+
+.final-poster-watermark {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  /* Fixed 380px would itself overflow a phone-width box (~327px) and force
+     a scrollbar for a purely decorative image — scale with the box instead. */
+  width: min(380px, 47%);
+  opacity: 0.1;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.final-poster-logo {
+  display: block;
+  margin: 0 auto 10px;
+  width: 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.final-poster-title {
+  font-family: "Cooper", serif;
+  font-size: clamp(26px, 8vw, 40px);
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.final-poster-credit {
+  text-align: center;
+  color: var(--muted-text);
+  font-size: 14px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.final-poster-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-top: 4%;
+  position: relative;
+  z-index: 1;
+}
+
+.final-poster-row {
+  padding: 4% 0;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  /* .final-poster-page sits inside .center-column, which sets
+     text-align: center for the landing/lobby screens — override it here,
+     same as .principle-row does for the in-flow poster card. */
+  text-align: left;
+}
+
+.final-poster-num {
+  font-family: "Cooper", serif;
+  font-size: 22px;
+  color: var(--freedom-blue);
+  font-weight: 500;
+  min-width: 32px;
+}
+
+.final-poster-body {
+  flex: 1;
+}
+
+.final-poster-row-title {
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.final-poster-row-body {
+  font-size: 14px;
+  color: var(--body-text);
+  line-height: 1.5;
+}
+
+/* The actual @page size rule is injected dynamically per the facilitator's
+   A4/A3 choice — see FinalPoster.tsx's applyPrintPaperSize(). */
+@media print {
+  /* 100vh means the on-screen browser viewport, not the physical printed
+     page — on a tall monitor that's taller than one A4/A3 page, forcing the
+     poster to 100vh made it overflow onto a second page. Ancestor padding
+     (.app-shell's min-height:100vh, .center-column's own padding) stacked
+     on top of that, compounding it. Reset all of it so only the poster's
+     own content + padding determines its printed height. */
+  .app-shell {
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .center-column {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    width: auto;
+  }
+
+  .final-poster-page {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: auto;
+    box-shadow: none;
+    margin: 0;
+  }
+}
