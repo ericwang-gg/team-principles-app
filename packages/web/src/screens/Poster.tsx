@@ -80,6 +80,16 @@ export function Poster({ state, isFacilitator, myName, sendAction, onRevise, rev
 
         {shown.map((p, i) => (
           <div className="principle-row" key={p.id}>
+            {isFacilitator && commentsOpen && !editMode && (
+              <button
+                type="button"
+                className="delete-x principle-row-remove no-print"
+                onClick={() => deletePrinciple(p.id)}
+                aria-label="Remove principle"
+              >
+                ×
+              </button>
+            )}
             <span className="principle-numeral">{i + 1}</span>
             <div className="principle-body">
               {editMode ? (
@@ -101,18 +111,7 @@ export function Poster({ state, isFacilitator, myName, sendAction, onRevise, rev
                 </>
               ) : (
                 <>
-                  <div className="principle-title-row">
-                    <strong>{p.title}</strong>
-                    {isFacilitator && commentsOpen && (
-                      <button
-                        type="button"
-                        className="delete-link no-print"
-                        onClick={() => deletePrinciple(p.id)}
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
+                  <strong>{p.title}</strong>
                   <p>{p.body}</p>
                 </>
               )}

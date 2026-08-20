@@ -1,10 +1,13 @@
 # GetGo Team Principles Builder
 
 Realtime facilitation app for the Product team to co-write their working principles in one
-session. See `../design_handoff_team_principles/` for the full design spec, screens, and product
-flow — this repo currently implements the environment/plumbing plus a first vertical slice
-(role select → name → lobby with live roster sync + a Claude-integration smoke test), not the
-full 9-phase flow yet.
+session. See `../design_handoff_team_principles/` for the original design spec, screens, and
+product flow, and `../Poster/` for the finalized poster design used by the final screen. **The
+full 9-phase flow is built and working end to end** (facilitator/participant onboarding → lobby
+→ Round 1 → topic synthesis → Round 2 → poster/comments → Round 3 → final poster), including
+live Claude integration, a demo/test mode, and a mobile-responsive layout. See `CLAUDE.md` for
+the detailed architecture and business-logic reference — this file stays focused on setup and
+running it locally.
 
 ## Stack
 
@@ -15,7 +18,9 @@ full 9-phase flow yet.
   - `src/local-dev/*.ts` — plain Node servers with the same behavior, for AWS-free local testing.
 - **Realtime sync**: a simple room relay (whatever one client sends, every other client in the
   same room receives, verbatim). `src/local-dev/relay-server.ts` locally; API Gateway WebSocket
-  API + DynamoDB (`src/ws/*.ts`) once deployed.
+  API + DynamoDB (`src/ws/*.ts`) once deployed. The frontend layers a facilitator-authoritative
+  state model on top (facilitator holds the source of truth, participants send actions,
+  facilitator broadcasts full-state syncs) — see `CLAUDE.md` for details.
 - **Infra**: SST (Ion) — `sst.config.ts` at the repo root, deploying to AWS Lambda.
 
 ## One-time machine setup
@@ -67,9 +72,17 @@ by loading `localhost:5173` alone. Three tiers, roughly in order of effort:
 
 ### 1. Solo iteration — multiple browser profiles (day-to-day default)
 
-Open `http://localhost:5173` in:
-- your normal Chrome window as the facilitator,
-- one or two Incognito windows (or a second browser — Safari/Firefox) as participants.
+Open `http://localhost:5173` (no `?room=`) in your normal Chrome window — you'll land in the
+facilitator flow automatically (there's no role picker; a bare URL always means "start a new
+session"). Confirming your name generates a room code and puts it in the address bar, e.g.
+`http://localhost:5173/?room=AB12C`. Copy *that* URL into one or two Incognito windows (or a
+second browser — Safari/Firefox) to join as participants — a room code already in the URL is
+what makes the app treat you as a participant instead of a facilitator; there's no manual
+"enter a room code" field, so participants can only join via that link.
+
+Turning on the **Demo mode** toggle during facilitator onboarding pre-fills every round's
+answer/pick/comment fields and skips all three live Claude calls, which makes solo click-through
+testing much faster — see `CLAUDE.md`'s "Demo mode" section for details.
 
 Each window gets its own `localStorage`/session, so they behave like separate people while all
 talking to the same relay + API processes on your machine. This is enough for iterating on the
@@ -109,9 +122,13 @@ We haven't done this yet since AWS isn't configured — happy to walk through it
 
 ### Automated regression check (later, optional)
 
-Once the full flow is built out, a Playwright script driving several browser contexts through
-join → answer → vote → comment in parallel would be a good regression check before a real team
-session. Not built yet — flagged as a nice-to-have, not needed for day-to-day dev.
+A Playwright script driving several browser contexts through join → answer → vote → comment in
+parallel would be a good regression check before a real team session. Not committed as a
+permanent test suite yet, but the approach is proven — Playwright + a real Chromium instance
+(`npx playwright install chromium`) was used ad hoc this project to drive the actual running dev
+server and catch real mobile-layout bugs (see `CLAUDE.md`'s "Mobile responsiveness" section).
+Turning that into a checked-in regression script is still a nice-to-have, not needed for
+day-to-day dev.
 
 ## Path to AWS / Lambda deployment
 
@@ -143,11 +160,12 @@ building this). Likely things to fix on the first `sst dev`:
 ## What's built vs. what's left
 
 Built: environment setup, monorepo structure, the realtime relay (local + AWS versions), all
-three Claude calls ported server-side from the prototype, and screens 1–3 (role select, name
-entry, lobby with live roster).
+three Claude calls, the full facilitator-authoritative session-state model, and the entire
+9-phase flow (onboarding → lobby → Round 1 → topic synthesis → Round 2 → poster/comments →
+Round 3 → final poster) — including demo mode and a mobile-responsive layout. See `CLAUDE.md`
+for the phase-by-phase business logic and where it now deliberately differs from the original
+design spec.
 
-Not built yet: Rounds 1–3, topic synthesis/voting, the poster + comments loop, and the
-facilitator-authoritative session-state model described in
-`../design_handoff_team_principles/README.md` (State Management section) — the lobby roster
-here is a simpler mesh-broadcast rather than "facilitator holds source of truth," which is fine
-for a 3-screen slice but will need the real reducer once Round 1 is built.
+Not built yet: AWS deployment (no credentials configured on this machine — see "Known gaps"
+below) and backend session-state persistence (state lives only in the facilitator's tab memory;
+a facilitator refresh loses the session — an accepted limitation, not a bug).

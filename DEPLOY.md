@@ -81,10 +81,16 @@ more detail):
 
 ## 6. Sanity-check after deploy
 
-- Open the printed web URL — you should see the app's role-select screen.
+- Open the printed web URL — you should land on "Let's write our principles." with a single
+  "Get started" button (a fresh URL with no `?room=` always means the facilitator flow now —
+  there's no role-picker screen). Confirming a name generates a room code into the URL; open
+  that same URL in another browser/incognito window and it should show "You're joining a
+  session" with a "Continue" button instead, confirming the WebSocket relay round-trips.
 - `VITE_WS_URL`/`VITE_API_URL` are wired into the build automatically from the deployed API URLs
   (see the `environment` block on the `Web` `StaticSite` in `sst.config.ts`) — no manual `.env`
-  edits needed post-deploy.
+  edits needed post-deploy. `VITE_DEMO_MODE` is deliberately *not* set here, so demo mode
+  defaults to off in production (it's a per-session toggle the facilitator can still turn on
+  from the onboarding screen — see `CLAUDE.md`'s "Demo mode" section).
 
 ## Redeploying later
 

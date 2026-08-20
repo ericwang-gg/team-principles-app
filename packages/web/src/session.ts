@@ -73,6 +73,8 @@ export type SessionAction =
   | { kind: "revealQuestion"; roundKey: RoundKey }
   | { kind: "nextQuestion"; roundKey: RoundKey }
   | { kind: "setTopics"; topics: Topic[] }
+  | { kind: "addTopic"; topic: Topic }
+  | { kind: "removeTopic"; topicId: string }
   | { kind: "setPhase"; phase: Phase }
   | { kind: "draftPrinciples"; principles: Principle[] }
   | { kind: "revisePrinciples"; principles: Principle[] }
@@ -254,6 +256,14 @@ export function reducer(state: SessionState, action: SessionAction): SessionStat
 
     case "setTopics":
       return { ...state, topics: action.topics, phase: "synth1" };
+
+    case "addTopic":
+      // Deliberately indistinguishable from a Claude-surfaced topic — no
+      // origin flag kept anywhere, so it can't leak into the UI later.
+      return { ...state, topics: [...(state.topics ?? []), action.topic] };
+
+    case "removeTopic":
+      return { ...state, topics: (state.topics ?? []).filter((t) => t.id !== action.topicId) };
 
     case "setPhase":
       return { ...state, phase: action.phase };

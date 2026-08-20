@@ -320,6 +320,44 @@ h2.lobby-headline {
   padding: 20px 24px;
 }
 
+.revealed-topic-card {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.revealed-topic-col {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .revealed-topic-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.not-picked-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 12px;
+  color: var(--muted-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.not-picked-divider::before,
+.not-picked-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
 .revealed-card strong {
   display: block;
   margin-bottom: 6px;
@@ -379,6 +417,7 @@ h2.lobby-headline {
 }
 
 .topic-card {
+  position: relative;
   background: white;
   border: 1.5px solid var(--hairline);
   border-radius: 20px;
@@ -387,6 +426,12 @@ h2.lobby-headline {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.topic-card-remove {
+  position: absolute;
+  top: 12px;
+  right: 14px;
 }
 
 .topic-card strong {
@@ -475,11 +520,18 @@ h2.lobby-headline {
 }
 
 .principle-row {
+  position: relative;
   display: flex;
   gap: 20px;
   text-align: left;
   padding: 20px 0;
   border-top: 1px solid var(--hairline);
+}
+
+.principle-row-remove {
+  position: absolute;
+  top: 20px;
+  right: 0;
 }
 
 .principle-row:first-of-type {
@@ -496,6 +548,9 @@ h2.lobby-headline {
 
 .principle-body {
   flex: 1;
+  /* Keeps a long title from running under the absolutely-positioned
+     .principle-row-remove "×" in the row's top-right corner. */
+  padding-right: 32px;
 }
 
 .principle-title-row {

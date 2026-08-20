@@ -278,6 +278,7 @@ function SessionApp({
         <TopicSynthesis
           state={state}
           isFacilitator={isFacilitator}
+          sendAction={sendAction}
           onContinue={() => sendAction({ kind: "setPhase", phase: "round2" })}
         />
       ) : state.phase === "round2" ? (

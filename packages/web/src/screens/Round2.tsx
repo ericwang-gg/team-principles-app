@@ -59,11 +59,11 @@ export function Round2({
   const draftLoadingLabel = useRotatingMessages(DRAFT_LOADING_MESSAGES, !!draftLoading);
   const revealed = state.round2.revealed;
 
-  const topicsByPopularity = [...topics].sort((a, b) => {
-    const countFor = (id: string) =>
-      Object.values(state.round2.submissions).filter((sub) => sub.picks.includes(id)).length;
-    return countFor(b.id) - countFor(a.id);
-  });
+  function pickCountFor(topicId: string) {
+    return Object.values(state.round2.submissions).filter((sub) => sub.picks.includes(topicId)).length;
+  }
+
+  const topicsByPopularity = [...topics].sort((a, b) => pickCountFor(b.id) - pickCountFor(a.id));
 
   return (
     <div className="center-column wide-column">
@@ -86,19 +86,35 @@ export function Round2({
 
       {revealed ? (
         <div className="revealed-answers">
-          {topicsByPopularity.map((t) => {
+          {topicsByPopularity.map((t, i) => {
             const pickers = state.participants.filter((p) => state.round2.submissions[p.id]?.picks.includes(t.id));
+            const isFirstUnpicked = pickers.length === 0 && (i === 0 || pickCountFor(topicsByPopularity[i - 1].id) > 0);
             return (
-              <div className="revealed-card" key={t.id}>
-                <strong>
-                  {t.label} — picked by {pickers.length}
-                </strong>
-                <p>{t.description}</p>
-                {pickers.map((p) => (
-                  <p key={p.id}>
-                    <strong>{p.name}:</strong> {state.round2.submissions[p.id]?.comments[t.id] || "(no comment)"}
-                  </p>
-                ))}
+              <div key={t.id}>
+                {isFirstUnpicked && (
+                  <div className="not-picked-divider">
+                    <span>Not picked by anyone</span>
+                  </div>
+                )}
+                <div className="revealed-card revealed-topic-card">
+                  <div className="revealed-topic-col">
+                    <strong>
+                      {t.label} — picked by {pickers.length}
+                    </strong>
+                    <p>{t.description}</p>
+                  </div>
+                  <div className="revealed-topic-col">
+                    {pickers.length > 0 ? (
+                      pickers.map((p) => (
+                        <p key={p.id}>
+                          <strong>{p.name}:</strong> {state.round2.submissions[p.id]?.comments[t.id] || "(no comment)"}
+                        </p>
+                      ))
+                    ) : (
+                      <p className="subhead">No one picked this.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}

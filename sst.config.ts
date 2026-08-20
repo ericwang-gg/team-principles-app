@@ -8,8 +8,10 @@
 //      ApiGatewayWebSocket doesn't yet have a documented way to link an API
 //      to its own route handlers (github.com/sst/sst/issues/4633). May need
 //      an explicit `permissions: [...]` grant once you see the IAM error.
-//   2. Confirm `packages/web` build output directory matches `build.output`
-//      below once the Vite app exists beyond this scaffold.
+//   2. `packages/web` build output directory: Vite's default (`dist`) is
+//      unconfigured/unoverridden in `packages/web/vite.config.ts`, matching
+//      `build.output` below — checked by reading the config, not by an
+//      actual deploy (still none run against real AWS).
 export default $config({
   app(input) {
     return {
